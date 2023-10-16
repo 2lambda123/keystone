@@ -10,19 +10,15 @@
 from keystone import *
 import regress
 
-def sym_resolver(symbol, value):
+def sym_resolver(symbol):
     if symbol == b'GetPhoneBuildString':
-        value = 0x41b000
-        return True
-    return False
+        return 0x41b000
+    return None
 
 class TestX86Nasm(regress.RegressTest):
     def runTest(self):
         ks = Ks(KS_ARCH_X86, KS_MODE_32)
         ks.syntax = KS_OPT_SYNTAX_NASM
-
-        dir(sym_resolver)
-
         ks.sym_resolver = sym_resolver
         encoding, count = ks.asm(b"call [GetPhoneBuildString]")
         self.assertEqual(encoding, [ 0xff, 0x15, 0x00, 0xb0, 0x41, 0x00 ])

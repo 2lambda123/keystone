@@ -22,23 +22,21 @@ def test_ks(arch, mode, code, syntax=0):
 
 # test symbol resolver
 def test_sym_resolver():
-    def sym_resolver(symbol, value):
+    def sym_resolver(symbol):
         # is this the missing symbol we want to handle?
         if symbol == "_l1":
-            # put value of this symbol in @value
-            value = 0x1002
-            # we handled this symbol, so return true
-            return True
+            # we handled this symbol
+            return 0x1005
 
-        # we did not handle this symbol, so return false
-        return False
+        # we did not handle this symbol, so return None
+        return None
 
     ks = Ks(KS_ARCH_X86, KS_MODE_32)
 
     # register callback for symbol resolver
     ks.sym_resolver = sym_resolver
 
-    CODE = b"jmp _l1; nop; _l1:"
+    CODE = b"jmp _l1; nop"
     encoding, count = ks.asm(CODE, 0x1000)
 
     print("%s = [ " % CODE, end='')
